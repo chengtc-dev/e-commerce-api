@@ -63,4 +63,14 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productDTO);
     }
 
+    @Operation(summary = "Delete Product", description = "Delete a product")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Delete product successfully")
+    })
+    @DeleteMapping("/{sku}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String sku) {
+        productService.deleteProduct(sku);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

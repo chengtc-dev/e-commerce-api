@@ -148,6 +148,20 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.path", equalTo("/api/products")));
     }
 
+    @Transactional
+    @Test
+    public void deleteProduct_success() throws Exception {
+        mockMvc.perform(buildDeleteProductRequest("MB-P-13-M1-SIL"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Transactional
+    @Test
+    public void deleteProduct_productNotExists() throws Exception {
+        mockMvc.perform(buildDeleteProductRequest("00-0-00-00-000"))
+                .andExpect(status().isNoContent());
+    }
+
     private RequestBuilder buildCreateProductRequest(ProductDTO productDTO) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .post("/api/products")
@@ -175,6 +189,11 @@ class ProductControllerTest {
                 .put("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productDTO));
+    }
+
+    private RequestBuilder buildDeleteProductRequest(String sku) {
+        return MockMvcRequestBuilders
+                .delete("/api/products/" + sku);
     }
 
     private static ProductDTO createTestProductDTO() {

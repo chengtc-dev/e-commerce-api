@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -20,6 +21,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
+    @Transactional
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         Product product = ProductMapper.toEntity(productDTO);
@@ -31,6 +33,7 @@ public class ProductServiceImpl implements ProductService {
         return ProductMapper.toDTO(product);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductDTO> getProducts(ProductQueryParam param) {
         Specification<Product> specification = Specification.where(null);
@@ -43,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
         return products.map(ProductMapper::toDTO);
     }
 
+    @Transactional
     @Override
     public ProductDTO updateProduct(ProductDTO productDTO) {
         Product existedProduct = productRepository.findBySku(productDTO.getSku())
@@ -53,5 +57,11 @@ public class ProductServiceImpl implements ProductService {
         existedProduct.setStock(productDTO.getStock());
         existedProduct = productRepository.save(existedProduct);
         return ProductMapper.toDTO(existedProduct);
+    }
+
+    @Transactional
+    @Override
+    public void deleteProduct(String sku) {
+        productRepository.deleteBySku(sku);
     }
 }

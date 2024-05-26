@@ -10,4 +10,6 @@ public interface ProductService {
     Page<ProductDTO> getProducts(ProductQueryParam param);
 
     ProductDTO updateProduct(ProductDTO productDTO);
+
+    void deleteProduct(String sku);
 }
