@@ -2,7 +2,8 @@ package dev.chengtc.ecommerceapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.chengtc.ecommerceapi.model.dto.ProductDTO;
+import dev.chengtc.ecommerceapi.model.dto.product.ProductDTO;
+import dev.chengtc.ecommerceapi.model.dto.product.ProductQueryParam;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -92,11 +94,60 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.path", equalTo("/api/products")));
     }
 
+    @Transactional
+    @Test
+    public void getProducts_success() throws Exception {
+        RequestBuilder requestBuilder = callGetProductsAPI(null);
+
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(10)));
+    }
+
+    @Transactional
+    @Test
+    public void getProducts_invalidArgument() throws Exception {
+        ProductQueryParam param = new ProductQueryParam();
+        param.setPageNumber(-1);
+        param.setPageSize(-1);
+        param.setOrderBy("?");
+        param.setSortBy("?");
+
+        RequestBuilder requestBuilder = callGetProductsAPI(param);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", allOf(
+                        containsString("pageSize: must be greater than or equal to 0"),
+                        containsString("pageNumber: must be greater than or equal to 0"),
+                        containsString("orderBy: must match \"createdAt|price\""),
+                        containsString("sortBy: must match \"desc|asc\"")
+                )))
+                .andExpect(jsonPath("$.path", equalTo("/api/products")));
+    }
+
     private RequestBuilder callCreateProductAPI(ProductDTO productDTO) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .post("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productDTO));
+    }
+
+    private RequestBuilder callGetProductsAPI(ProductQueryParam param) {
+        if (param == null) {
+            return MockMvcRequestBuilders
+                    .get("/api/products");
+        } else {
+            return MockMvcRequestBuilders
+                    .get("/api/products")
+                    .param("keyword", param.getKeyword())
+                    .param("orderBy", param.getOrderBy())
+                    .param("sortBy", param.getSortBy())
+                    .param("pageSize", String.valueOf(param.getPageSize()))
+                    .param("pageNumber", String.valueOf(param.getPageNumber()));
+        }
     }
 
 }

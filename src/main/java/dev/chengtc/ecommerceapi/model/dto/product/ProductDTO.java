@@ -1,4 +1,4 @@
-package dev.chengtc.ecommerceapi.model.dto;
+package dev.chengtc.ecommerceapi.model.dto.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
