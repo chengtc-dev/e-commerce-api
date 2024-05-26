@@ -51,4 +51,16 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productDTOList);
     }
 
+    @Operation(summary = "Update Product", description = "Update a existed product")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Update product successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid argument",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping
+    public ResponseEntity<ProductDTO> updateProduct(@RequestBody @Valid ProductDTO productDTO) {
+        productDTO = productService.updateProduct(productDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(productDTO);
+    }
+
 }

@@ -8,4 +8,6 @@ public interface ProductService {
     ProductDTO createProduct(ProductDTO productDTO);
 
     Page<ProductDTO> getProducts(ProductQueryParam param);
+
+    ProductDTO updateProduct(ProductDTO productDTO);
 }

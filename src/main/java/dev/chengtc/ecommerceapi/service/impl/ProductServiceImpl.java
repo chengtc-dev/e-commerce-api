@@ -1,6 +1,7 @@
 package dev.chengtc.ecommerceapi.service.impl;
 
-import dev.chengtc.ecommerceapi.exception.ProductExistsException;
+import dev.chengtc.ecommerceapi.exception.product.ProductExistsException;
+import dev.chengtc.ecommerceapi.exception.product.ProductNotFoundException;
 import dev.chengtc.ecommerceapi.mapper.ProductMapper;
 import dev.chengtc.ecommerceapi.model.dto.product.ProductDTO;
 import dev.chengtc.ecommerceapi.model.dto.product.ProductQueryParam;
@@ -40,5 +41,17 @@ public class ProductServiceImpl implements ProductService {
 
         Page<Product> products = productRepository.findAll(specification, param.getPageRequest());
         return products.map(ProductMapper::toDTO);
+    }
+
+    @Override
+    public ProductDTO updateProduct(ProductDTO productDTO) {
+        Product existedProduct = productRepository.findBySku(productDTO.getSku())
+                .orElseThrow(() -> new ProductNotFoundException(productDTO.getSku()));
+        existedProduct.setName(productDTO.getName());
+        existedProduct.setDescription(productDTO.getDescription());
+        existedProduct.setPrice(productDTO.getPrice());
+        existedProduct.setStock(productDTO.getStock());
+        existedProduct = productRepository.save(existedProduct);
+        return ProductMapper.toDTO(existedProduct);
     }
 }

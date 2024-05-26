@@ -1,4 +1,4 @@
-package dev.chengtc.ecommerceapi.exception;
+package dev.chengtc.ecommerceapi.exception.product;
 
 public class ProductExistsException extends RuntimeException {
 

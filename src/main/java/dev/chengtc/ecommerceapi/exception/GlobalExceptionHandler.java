@@ -1,5 +1,7 @@
 package dev.chengtc.ecommerceapi.exception;
 
+import dev.chengtc.ecommerceapi.exception.product.ProductExistsException;
+import dev.chengtc.ecommerceapi.exception.product.ProductNotFoundException;
 import dev.chengtc.ecommerceapi.model.dto.ErrorResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
@@ -33,8 +35,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(ProductExistsException.class)
-    public ResponseEntity<ErrorResponse> handleProductExistsException(ProductExistsException e, ServletWebRequest request) {
+    @ExceptionHandler({ProductExistsException.class, ProductNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleProductException(Exception e, ServletWebRequest request) {
         log.warn(e.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse();

@@ -30,25 +30,13 @@ class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private static ProductDTO getProductDTO() {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setName("13-inch MacBook Air with M3 chip - Midnight");
-        productDTO.setSku("MB-A-13-M3-MID");
-        productDTO.setDescription("MacBook Air sails through work and play — and the M3 chip brings even greater capabilities to the world’s most popular laptop. With up to 18 hours of battery life, you can take the super portable MacBook Air anywhere and blaze through whatever you’re into.");
-        productDTO.setPrice(BigDecimal.valueOf(1299));
-        productDTO.setStock(10000000);
-        return productDTO;
-    }
-
     @Transactional
     @Test
     public void createProduct_success() throws Exception {
-        ProductDTO productDTO = getProductDTO();
+        ProductDTO productDTO = createTestProductDTO();
 
-        RequestBuilder requestBuilder = callCreateProductAPI(productDTO);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(201))
+        mockMvc.perform(buildCreateProductRequest(productDTO))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", equalTo("13-inch MacBook Air with M3 chip - Midnight")))
                 .andExpect(jsonPath("$.sku", equalTo("MB-A-13-M3-MID")))
                 .andExpect(jsonPath("$.description", equalTo("MacBook Air sails through work and play — and the M3 chip brings even greater capabilities to the world’s most popular laptop. With up to 18 hours of battery life, you can take the super portable MacBook Air anywhere and blaze through whatever you’re into.")))
@@ -59,15 +47,13 @@ class ProductControllerTest {
     @Transactional
     @Test
     public void createProduct_productExists() throws Exception {
-        ProductDTO productDTO = getProductDTO();
+        ProductDTO productDTO = createTestProductDTO();
 
-        RequestBuilder requestBuilder = callCreateProductAPI(productDTO);
+        mockMvc.perform(buildCreateProductRequest(productDTO))
+                .andExpect(status().isCreated());
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(201));
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400))
+        mockMvc.perform(buildCreateProductRequest(productDTO))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", containsStringIgnoringCase("already exist")))
                 .andExpect(jsonPath("$.path", equalTo("/api/products")));
@@ -76,14 +62,10 @@ class ProductControllerTest {
     @Transactional
     @Test
     public void createProduct_invalidArgument() throws Exception {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setPrice(BigDecimal.valueOf(-1299));
-        productDTO.setStock(-10000000);
+        ProductDTO productDTO = createInvalidProductDTO();
 
-        RequestBuilder requestBuilder = callCreateProductAPI(productDTO);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400))
+        mockMvc.perform(buildCreateProductRequest(productDTO))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", allOf(
                                 containsString("sku: must not be blank"),
@@ -94,18 +76,14 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.path", equalTo("/api/products")));
     }
 
-    @Transactional
     @Test
     public void getProducts_success() throws Exception {
-        RequestBuilder requestBuilder = callGetProductsAPI(null);
-
-        mockMvc.perform(requestBuilder)
+        mockMvc.perform(buildGetProductsRequest(null))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(10)));
     }
 
-    @Transactional
     @Test
     public void getProducts_invalidArgument() throws Exception {
         ProductQueryParam param = new ProductQueryParam();
@@ -114,10 +92,8 @@ class ProductControllerTest {
         param.setOrderBy("?");
         param.setSortBy("?");
 
-        RequestBuilder requestBuilder = callGetProductsAPI(param);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400))
+        mockMvc.perform(buildGetProductsRequest(param))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", allOf(
                         containsString("pageSize: must be greater than or equal to 0"),
@@ -128,14 +104,58 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.path", equalTo("/api/products")));
     }
 
-    private RequestBuilder callCreateProductAPI(ProductDTO productDTO) throws JsonProcessingException {
+    @Transactional
+    @Test
+    public void updateProduct_success() throws Exception {
+        ProductDTO productDTO = createTestUpdateProductDTO();
+
+        mockMvc.perform(buildUpdateProductRequest(productDTO))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", equalTo("Test Update Product API")))
+                .andExpect(jsonPath("$.sku", equalTo("MB-P-13-M1-SIL")))
+                .andExpect(jsonPath("$.description", equalTo("Test Update Product API")))
+                .andExpect(jsonPath("$.price", equalTo(1000)))
+                .andExpect(jsonPath("$.stock", equalTo(10)));
+    }
+
+    @Transactional
+    @Test
+    public void updateProduct_productNotFound() throws Exception {
+        ProductDTO productDTO = createTestProductDTO();
+        productDTO.setSku("00-0-00-00-000");
+
+        mockMvc.perform(buildUpdateProductRequest(productDTO))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", containsStringIgnoringCase("not found")))
+                .andExpect(jsonPath("$.path", equalTo("/api/products")));
+    }
+
+    @Transactional
+    @Test
+    public void updateProduct_invalidArgument() throws Exception {
+        ProductDTO productDTO = createInvalidProductDTO();
+
+        mockMvc.perform(buildCreateProductRequest(productDTO))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", allOf(
+                        containsString("sku: must not be blank"),
+                        containsString("price: must be greater than 0"),
+                        containsString("stock: must be greater than 0"),
+                        containsString("name: must not be blank")
+                )))
+                .andExpect(jsonPath("$.path", equalTo("/api/products")));
+    }
+
+    private RequestBuilder buildCreateProductRequest(ProductDTO productDTO) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .post("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productDTO));
     }
 
-    private RequestBuilder callGetProductsAPI(ProductQueryParam param) {
+    private RequestBuilder buildGetProductsRequest(ProductQueryParam param) {
         if (param == null) {
             return MockMvcRequestBuilders
                     .get("/api/products");
@@ -148,6 +168,40 @@ class ProductControllerTest {
                     .param("pageSize", String.valueOf(param.getPageSize()))
                     .param("pageNumber", String.valueOf(param.getPageNumber()));
         }
+    }
+
+    private RequestBuilder buildUpdateProductRequest(ProductDTO productDTO) throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .put("/api/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productDTO));
+    }
+
+    private static ProductDTO createTestProductDTO() {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName("13-inch MacBook Air with M3 chip - Midnight");
+        productDTO.setSku("MB-A-13-M3-MID");
+        productDTO.setDescription("MacBook Air sails through work and play — and the M3 chip brings even greater capabilities to the world’s most popular laptop. With up to 18 hours of battery life, you can take the super portable MacBook Air anywhere and blaze through whatever you’re into.");
+        productDTO.setPrice(BigDecimal.valueOf(1299));
+        productDTO.setStock(10000000);
+        return productDTO;
+    }
+
+    private static ProductDTO createTestUpdateProductDTO() {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setPrice(BigDecimal.valueOf(1000));
+        productDTO.setStock(10);
+        productDTO.setName("Test Update Product API");
+        productDTO.setSku("MB-P-13-M1-SIL");
+        productDTO.setDescription("Test Update Product API");
+        return productDTO;
+    }
+
+    private static ProductDTO createInvalidProductDTO() {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setPrice(BigDecimal.valueOf(-1299));
+        productDTO.setStock(-10000000);
+        return productDTO;
     }
 
 }
