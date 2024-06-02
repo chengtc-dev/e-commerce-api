@@ -6,5 +6,5 @@ spring:
     password: ${POSTGRES_PASSWORD:postgres}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: false

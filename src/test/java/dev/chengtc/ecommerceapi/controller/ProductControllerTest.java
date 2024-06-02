@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -166,13 +167,15 @@ class ProductControllerTest {
         return MockMvcRequestBuilders
                 .post("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDTO));
+                .content(objectMapper.writeValueAsString(productDTO))
+                .with(httpBasic("product_seller@e-commerce.org", "product_seller"));
     }
 
     private RequestBuilder buildGetProductsRequest(ProductQueryParam param) {
         if (param == null) {
             return MockMvcRequestBuilders
-                    .get("/api/products");
+                    .get("/api/products")
+                    .with(httpBasic("normal_member@e-commerce.org", "normal_member"));
         } else {
             return MockMvcRequestBuilders
                     .get("/api/products")
@@ -180,7 +183,8 @@ class ProductControllerTest {
                     .param("orderBy", param.getOrderBy())
                     .param("sortBy", param.getSortBy())
                     .param("pageSize", String.valueOf(param.getPageSize()))
-                    .param("pageNumber", String.valueOf(param.getPageNumber()));
+                    .param("pageNumber", String.valueOf(param.getPageNumber()))
+                    .with(httpBasic("normal_member@e-commerce.org", "normal_member"));
         }
     }
 
@@ -188,12 +192,14 @@ class ProductControllerTest {
         return MockMvcRequestBuilders
                 .put("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDTO));
+                .content(objectMapper.writeValueAsString(productDTO))
+                .with(httpBasic("product_seller@e-commerce.org", "product_seller"));
     }
 
     private RequestBuilder buildDeleteProductRequest(String sku) {
         return MockMvcRequestBuilders
-                .delete("/api/products/" + sku);
+                .delete("/api/products/" + sku)
+                .with(httpBasic("product_seller@e-commerce.org", "product_seller"));
     }
 
     private static ProductDTO createTestProductDTO() {
