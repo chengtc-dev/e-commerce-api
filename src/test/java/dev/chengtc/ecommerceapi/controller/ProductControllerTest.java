@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -168,7 +169,8 @@ class ProductControllerTest {
                 .post("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productDTO))
-                .with(httpBasic("product_seller@e-commerce.org", "product_seller"));
+                .with(httpBasic("product_seller@e-commerce.org", "product_seller"))
+                .with(csrf());
     }
 
     private RequestBuilder buildGetProductsRequest(ProductQueryParam param) {
@@ -193,16 +195,18 @@ class ProductControllerTest {
                 .put("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productDTO))
-                .with(httpBasic("product_seller@e-commerce.org", "product_seller"));
+                .with(httpBasic("product_seller@e-commerce.org", "product_seller"))
+                .with(csrf());
     }
 
     private RequestBuilder buildDeleteProductRequest(String sku) {
         return MockMvcRequestBuilders
                 .delete("/api/products/" + sku)
-                .with(httpBasic("product_seller@e-commerce.org", "product_seller"));
+                .with(httpBasic("product_seller@e-commerce.org", "product_seller"))
+                .with(csrf());
     }
 
-    private static ProductDTO createTestProductDTO() {
+    public static ProductDTO createTestProductDTO() {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setName("13-inch MacBook Air with M3 chip - Midnight");
         productDTO.setSku("MB-A-13-M3-MID");
