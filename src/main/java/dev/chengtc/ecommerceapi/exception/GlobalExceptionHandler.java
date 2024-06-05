@@ -4,6 +4,7 @@ import dev.chengtc.ecommerceapi.exception.member.MemberExistsException;
 import dev.chengtc.ecommerceapi.exception.member.RoleNotFoundException;
 import dev.chengtc.ecommerceapi.exception.product.ProductExistsException;
 import dev.chengtc.ecommerceapi.exception.product.ProductNotFoundException;
+import dev.chengtc.ecommerceapi.exception.product.ProductStockShortageException;
 import dev.chengtc.ecommerceapi.model.dto.ErrorResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler({ProductExistsException.class, ProductNotFoundException.class})
+    @ExceptionHandler({ProductExistsException.class, ProductNotFoundException.class, ProductStockShortageException.class})
     public ResponseEntity<ErrorResponse> handleProductException(Exception e, ServletWebRequest request) {
         return handleCustomException(e, request, HttpStatus.BAD_REQUEST);
     }

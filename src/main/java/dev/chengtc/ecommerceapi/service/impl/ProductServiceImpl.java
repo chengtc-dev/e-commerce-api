@@ -2,6 +2,7 @@ package dev.chengtc.ecommerceapi.service.impl;
 
 import dev.chengtc.ecommerceapi.exception.product.ProductExistsException;
 import dev.chengtc.ecommerceapi.exception.product.ProductNotFoundException;
+import dev.chengtc.ecommerceapi.exception.product.ProductStockShortageException;
 import dev.chengtc.ecommerceapi.mapper.ProductMapper;
 import dev.chengtc.ecommerceapi.model.dto.product.ProductDTO;
 import dev.chengtc.ecommerceapi.model.dto.product.ProductQueryParam;
@@ -49,8 +50,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public ProductDTO updateProduct(ProductDTO productDTO) {
-        Product existedProduct = productRepository.findBySku(productDTO.getSku())
-                .orElseThrow(() -> new ProductNotFoundException(productDTO.getSku()));
+        Product existedProduct = getProductBySKU(productDTO.getSku());
         existedProduct.setName(productDTO.getName());
         existedProduct.setDescription(productDTO.getDescription());
         existedProduct.setPrice(productDTO.getPrice());
@@ -64,4 +64,24 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(String sku) {
         productRepository.deleteBySku(sku);
     }
+
+    @Transactional
+    @Override
+    public Product getProductBySKU(String sku) {
+        return productRepository.findBySku(sku)
+                .orElseThrow(() -> new ProductNotFoundException(sku));
+    }
+
+    @Transactional
+    @Override
+    public void updateStock(Integer remainingStock, String sku) {
+        Product existedProduct = getProductBySKU(sku);
+
+        if (remainingStock < 0)
+            throw new ProductStockShortageException(existedProduct.getName(), existedProduct.getStock());
+
+        existedProduct.setStock(remainingStock);
+        productRepository.save(existedProduct);
+    }
+
 }
