@@ -2,7 +2,8 @@ package dev.chengtc.ecommerceapi.service.impl;
 
 import dev.chengtc.ecommerceapi.mapper.OrderMapper;
 import dev.chengtc.ecommerceapi.model.dto.order.OrderPlaceRequest;
-import dev.chengtc.ecommerceapi.model.dto.order.OrderPlaceResponse;
+import dev.chengtc.ecommerceapi.model.dto.order.OrderResponse;
+import dev.chengtc.ecommerceapi.model.dto.order.OrderQueryParam;
 import dev.chengtc.ecommerceapi.model.entity.Order;
 import dev.chengtc.ecommerceapi.model.entity.OrderItem;
 import dev.chengtc.ecommerceapi.model.entity.Product;
@@ -11,6 +12,8 @@ import dev.chengtc.ecommerceapi.repository.OrderRepository;
 import dev.chengtc.ecommerceapi.service.OrderService;
 import dev.chengtc.ecommerceapi.service.ProductService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public OrderPlaceResponse placeOrder(OrderPlaceRequest request) {
+    public OrderResponse placeOrder(OrderPlaceRequest request) {
         Order order = OrderMapper.toEntity(request);
         order.setOrderDate(LocalDate.now());
         order.setOrderNumber(generateOrderNumber());
@@ -57,8 +60,23 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
         order = orderRepository.save(order);
         orderItems = orderItemRepository.saveAll(orderItems);
+        order.setOrderItems(orderItems);
 
-        return OrderMapper.toDTO(order, orderItems);
+        return OrderMapper.toDTO(order);
+    }
+
+    @Override
+    public Page<OrderResponse> getOrders(OrderQueryParam param) {
+        Specification<Order> specification = Specification.where(null);
+
+        Page<Order> orders = orderRepository.findAll(specification, param.getPageRequest());
+
+        for (Order order : orders) {
+            List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(order.getId());
+            order.setOrderItems(orderItems);
+        }
+
+        return orders.map(OrderMapper::toDTO);
     }
 
     private String generateOrderNumber() {

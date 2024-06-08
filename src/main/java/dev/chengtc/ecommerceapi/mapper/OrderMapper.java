@@ -2,7 +2,7 @@ package dev.chengtc.ecommerceapi.mapper;
 
 import dev.chengtc.ecommerceapi.model.dto.order.OrderItemResponse;
 import dev.chengtc.ecommerceapi.model.dto.order.OrderPlaceRequest;
-import dev.chengtc.ecommerceapi.model.dto.order.OrderPlaceResponse;
+import dev.chengtc.ecommerceapi.model.dto.order.OrderResponse;
 import dev.chengtc.ecommerceapi.model.entity.Order;
 import dev.chengtc.ecommerceapi.model.entity.OrderItem;
 
@@ -21,14 +21,13 @@ public class OrderMapper {
         return order;
     }
 
-    public static OrderPlaceResponse toDTO(Order order, List<OrderItem> orderItems) {
-        List<OrderItemResponse> orderItemResponse = orderItems.stream()
+    public static OrderResponse toDTO(Order order) {
+        List<OrderItemResponse> orderItemResponse = order.getOrderItems().stream()
                 .map(OrderItemMapper::toDTO)
                 .toList();
 
-        OrderPlaceResponse response = new OrderPlaceResponse();
+        OrderResponse response = new OrderResponse();
         response.setOrderDate(order.getOrderDate());
-        response.setBuyerEmail(order.getBuyerEmail());
         response.setTotalAmount(order.getTotalAmount());
         response.setOrderNumber(order.getOrderNumber());
         response.setOrderItems(orderItemResponse);

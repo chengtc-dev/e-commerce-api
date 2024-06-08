@@ -1,10 +1,8 @@
-package dev.chengtc.ecommerceapi.model.dto.product;
+package dev.chengtc.ecommerceapi.model.dto.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.PageRequest;
@@ -12,12 +10,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 @Getter @Setter
-public class ProductQueryParam {
+@Schema(name = "OrderQueryParam")
+public class OrderQueryParam {
 
-    @Schema(example = "MacBook")
-    private String keyword = "";
+    @Email
+    @NotBlank
+    @Schema(example = "normal_member@e-commerce.org")
+    private String email;
 
-    @Pattern(regexp = "createdAt|price")
+    @Pattern(regexp = "createdAt|totalAmount")
     @Schema(example = "createdAt")
     private String orderBy = "createdAt";
 

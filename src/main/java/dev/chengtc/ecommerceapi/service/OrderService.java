@@ -1,8 +1,12 @@
 package dev.chengtc.ecommerceapi.service;
 
 import dev.chengtc.ecommerceapi.model.dto.order.OrderPlaceRequest;
-import dev.chengtc.ecommerceapi.model.dto.order.OrderPlaceResponse;
+import dev.chengtc.ecommerceapi.model.dto.order.OrderResponse;
+import dev.chengtc.ecommerceapi.model.dto.order.OrderQueryParam;
+import org.springframework.data.domain.Page;
 
 public interface OrderService {
-    OrderPlaceResponse placeOrder(OrderPlaceRequest request);
+    OrderResponse placeOrder(OrderPlaceRequest request);
+
+    Page<OrderResponse> getOrders(OrderQueryParam param);
 }

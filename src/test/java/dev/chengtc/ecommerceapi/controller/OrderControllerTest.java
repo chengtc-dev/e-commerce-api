@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.chengtc.ecommerceapi.model.dto.order.OrderItemRequest;
 import dev.chengtc.ecommerceapi.model.dto.order.OrderPlaceRequest;
+import dev.chengtc.ecommerceapi.model.dto.order.OrderQueryParam;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +22,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,7 +44,6 @@ class OrderControllerTest {
         mockMvc.perform(buildPlaceOrderRequest(request))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.orderNumber", notNullValue()))
-                .andExpect(jsonPath("$.buyerEmail", equalTo("normal_member@e-commerce.org")))
                 .andExpect(jsonPath("$.totalAmount", equalTo(15985.00)))
                 .andExpect(jsonPath("$.orderItems", hasSize(2)))
                 .andExpect(jsonPath("$.orderDate", notNullValue()));
@@ -112,6 +113,37 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.path", equalTo("/api/orders")));
     }
 
+    @Test
+    public void getOrders_success() throws Exception {
+        mockMvc.perform(buildGetOrdersRequest(null))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(3)));
+    }
+
+    @Test
+    public void getOrders_invalidArgument() throws Exception {
+        OrderQueryParam param = new OrderQueryParam();
+        param.setEmail("@@");
+        param.setPageNumber(-1);
+        param.setPageSize(-1);
+        param.setOrderBy("?");
+        param.setSortBy("?");
+
+        mockMvc.perform(buildGetOrdersRequest(param))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", allOf(
+                        containsString("email: must be a well-formed email address"),
+                        containsString("pageSize: must be greater than or equal to 0"),
+                        containsString("pageNumber: must be greater than or equal to 0"),
+                        containsString("orderBy: must match \"createdAt|totalAmount\""),
+                        containsString("sortBy: must match \"desc|asc\"")
+                )))
+                .andExpect(jsonPath("$.path", equalTo("/api/orders")));
+    }
+
+
     private static OrderPlaceRequest createOrderPlaceRequest() {
         OrderPlaceRequest request = new OrderPlaceRequest();
         List<OrderItemRequest> orderItemRequests = new ArrayList<>();
@@ -155,4 +187,23 @@ class OrderControllerTest {
                 .with(httpBasic("normal_member@e-commerce.org", "normal_member"))
                 .with(csrf());
     }
+
+    private RequestBuilder buildGetOrdersRequest(OrderQueryParam param) {
+        if (param == null) {
+            return MockMvcRequestBuilders
+                    .get("/api/orders")
+                    .param("email", "normal_member@e-commerce.org")
+                    .with(httpBasic("normal_member@e-commerce.org", "normal_member"));
+        } else {
+            return MockMvcRequestBuilders
+                    .get("/api/orders")
+                    .param("email", param.getEmail())
+                    .param("orderBy", param.getOrderBy())
+                    .param("sortBy", param.getSortBy())
+                    .param("pageSize", String.valueOf(param.getPageSize()))
+                    .param("pageNumber", String.valueOf(param.getPageNumber()))
+                    .with(httpBasic("normal_member@e-commerce.org", "normal_member"));
+        }
+    }
+
 }

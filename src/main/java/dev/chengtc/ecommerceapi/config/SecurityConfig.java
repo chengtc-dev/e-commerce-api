@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/products").hasAnyRole("PRODUCT_SELLER", "SYSTEM_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products").hasAnyRole("PRODUCT_SELLER", "SYSTEM_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/*").hasAnyRole("PRODUCT_SELLER", "SYSTEM_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("NORMAL_MEMBER", "SYSTEM_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("NORMAL_MEMBER", "SYSTEM_ADMIN")
                         .anyRequest().denyAll()
                 )

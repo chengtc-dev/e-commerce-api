@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-@Schema(name = "OrderItem")
+@Schema(name = "OrderItemRequest")
 public class OrderItemRequest {
 
     @NotNull

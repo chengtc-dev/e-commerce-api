@@ -9,14 +9,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter @Setter
-@Schema(name = "OrderPlaceResponse")
-public class OrderPlaceResponse {
+@Schema(name = "OrderResponse")
+public class OrderResponse {
 
     @Schema(example = "1000.00")
     private BigDecimal totalAmount;
-
-    @Schema(example = "spring-boot@e-commerce.org")
-    private String buyerEmail;
 
     @Schema(example = "2007-12-03")
     private LocalDate orderDate;

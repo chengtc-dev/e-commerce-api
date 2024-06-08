@@ -20,3 +20,14 @@ INSERT INTO roles (version, created_at, updated_at, created_by, name, updated_by
 INSERT INTO member_role (member_id, role_id) VALUES (1, 1);
 INSERT INTO member_role (member_id, role_id) VALUES (2, 2);
 INSERT INTO member_role (member_id, role_id) VALUES (3, 3);
+
+INSERT INTO orders (order_date, total_amount, version, created_at, updated_at, buyer_email, created_by, order_number, updated_by) VALUES ('2024-06-08', 12990.00, 0, '2024-06-08 19:11:01.193997', null, 'normal_member@e-commerce.org', 'system admin', 'MA2024060819110118234', null);
+INSERT INTO orders (order_date, total_amount, version, created_at, updated_at, buyer_email, created_by, order_number, updated_by) VALUES ('2024-06-08', 38970.00, 0, '2024-06-08 19:11:31.016649', null, 'normal_member@e-commerce.org', 'system admin', 'MA2024060819113108550', null);
+INSERT INTO orders (order_date, total_amount, version, created_at, updated_at, buyer_email, created_by, order_number, updated_by) VALUES ('2024-06-08', 71940.00, 0, '2024-06-08 19:12:31.201999', null, 'normal_member@e-commerce.org', 'system admin', 'MA2024060819123104104', null);
+
+INSERT INTO order_items (amount, quantity, version, created_at, order_id, updated_at, sku, created_by, updated_by) VALUES (12990.00, 10, 0, '2024-06-08 19:11:01.221069', 1, null, 'MB-P-13-M2-GRE', 'system admin', null);
+INSERT INTO order_items (amount, quantity, version, created_at, order_id, updated_at, sku, created_by, updated_by) VALUES (12990.00, 10, 0, '2024-06-08 19:11:31.048894', 2, null, 'MB-P-13-M2-GRE', 'system admin', null);
+INSERT INTO order_items (amount, quantity, version, created_at, order_id, updated_at, sku, created_by, updated_by) VALUES (25980.00, 20, 0, '2024-06-08 19:11:31.051579', 2, null, 'MB-P-13-M2-SIL', 'system admin', null);
+INSERT INTO order_items (amount, quantity, version, created_at, order_id, updated_at, sku, created_by, updated_by) VALUES (12990.00, 10, 0, '2024-06-08 19:12:31.244167', 3, null, 'MB-P-13-M2-GRE', 'system admin', null);
+INSERT INTO order_items (amount, quantity, version, created_at, order_id, updated_at, sku, created_by, updated_by) VALUES (25980.00, 20, 0, '2024-06-08 19:12:31.248625', 3, null, 'MB-P-13-M2-SIL', 'system admin', null);
+INSERT INTO order_items (amount, quantity, version, created_at, order_id, updated_at, sku, created_by, updated_by) VALUES (32970.00, 30, 0, '2024-06-08 19:12:31.250744', 3, null, 'MB-A-13-M2-GRE', 'system admin', null);

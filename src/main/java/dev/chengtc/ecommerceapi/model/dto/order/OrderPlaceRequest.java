@@ -13,7 +13,7 @@ import java.util.List;
 public class OrderPlaceRequest {
 
     @NotBlank
-    @Schema(example = "spring-boot@e-commerce.org")
+    @Schema(example = "normal_member@e-commerce.org")
     private String buyerEmail;
 
     @NotEmpty
