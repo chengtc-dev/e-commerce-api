@@ -43,7 +43,8 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.sku", equalTo("MB-A-13-M3-MID")))
                 .andExpect(jsonPath("$.description", equalTo("MacBook Air sails through work and play — and the M3 chip brings even greater capabilities to the world’s most popular laptop. With up to 18 hours of battery life, you can take the super portable MacBook Air anywhere and blaze through whatever you’re into.")))
                 .andExpect(jsonPath("$.price", equalTo(1299)))
-                .andExpect(jsonPath("$.stock", equalTo(10000000)));
+                .andExpect(jsonPath("$.stock", equalTo(10000000)))
+                .andExpect(jsonPath("$.imageSrc", equalTo("https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mba13-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1708367688034")));
     }
 
     @Transactional
@@ -73,7 +74,8 @@ class ProductControllerTest {
                                 containsString("sku: must not be blank"),
                                 containsString("price: must be greater than 0"),
                                 containsString("stock: must be greater than 0"),
-                                containsString("name: must not be blank")
+                                containsString("name: must not be blank"),
+                                containsString("imageSrc: must be a valid URL")
                         )))
                 .andExpect(jsonPath("$.path", equalTo("/api/products")));
     }
@@ -114,10 +116,11 @@ class ProductControllerTest {
         mockMvc.perform(buildUpdateProductRequest(productDTO))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", equalTo("Test Update Product API")))
-                .andExpect(jsonPath("$.sku", equalTo("MB-P-13-M1-SIL")))
+                .andExpect(jsonPath("$.sku", equalTo("FA-001")))
                 .andExpect(jsonPath("$.description", equalTo("Test Update Product API")))
                 .andExpect(jsonPath("$.price", equalTo(1000)))
-                .andExpect(jsonPath("$.stock", equalTo(10)));
+                .andExpect(jsonPath("$.stock", equalTo(10)))
+                .andExpect(jsonPath("$.imageSrc", equalTo("https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mba13-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1708367688034")));
     }
 
     @Transactional
@@ -213,6 +216,7 @@ class ProductControllerTest {
         productDTO.setDescription("MacBook Air sails through work and play — and the M3 chip brings even greater capabilities to the world’s most popular laptop. With up to 18 hours of battery life, you can take the super portable MacBook Air anywhere and blaze through whatever you’re into.");
         productDTO.setPrice(BigDecimal.valueOf(1299));
         productDTO.setStock(10000000);
+        productDTO.setImageSrc("https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mba13-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1708367688034");
         return productDTO;
     }
 
@@ -221,8 +225,9 @@ class ProductControllerTest {
         productDTO.setPrice(BigDecimal.valueOf(1000));
         productDTO.setStock(10);
         productDTO.setName("Test Update Product API");
-        productDTO.setSku("MB-P-13-M1-SIL");
+        productDTO.setSku("FA-001");
         productDTO.setDescription("Test Update Product API");
+        productDTO.setImageSrc("https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mba13-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1708367688034");
         return productDTO;
     }
 
@@ -230,6 +235,7 @@ class ProductControllerTest {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setPrice(BigDecimal.valueOf(-1299));
         productDTO.setStock(-10000000);
+        productDTO.setImageSrc("?");
         return productDTO;
     }
 

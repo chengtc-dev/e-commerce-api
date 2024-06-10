@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 
@@ -33,5 +34,10 @@ public class ProductDTO {
     @Positive
     @Schema(example = "10000000")
     private Integer stock;
+
+    @NotNull
+    @URL
+    @Schema(example = "https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/mba13-midnight-select-202402?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1708367688034")
+    private String imageSrc;
 
 }

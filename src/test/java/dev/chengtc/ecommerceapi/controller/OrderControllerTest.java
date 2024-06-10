@@ -44,7 +44,7 @@ class OrderControllerTest {
         mockMvc.perform(buildPlaceOrderRequest(request))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.orderNumber", notNullValue()))
-                .andExpect(jsonPath("$.totalAmount", equalTo(15985.00)))
+                .andExpect(jsonPath("$.totalAmount", equalTo(1211.00)))
                 .andExpect(jsonPath("$.orderItems", hasSize(2)))
                 .andExpect(jsonPath("$.orderDate", notNullValue()));
     }
@@ -149,12 +149,12 @@ class OrderControllerTest {
         List<OrderItemRequest> orderItemRequests = new ArrayList<>();
 
         OrderItemRequest orderItemRequest = new OrderItemRequest();
-        orderItemRequest.setSku("MB-P-13-M1-SIL");
+        orderItemRequest.setSku("FA-001");
         orderItemRequest.setQuantity(10);
         orderItemRequests.add(orderItemRequest);
 
         OrderItemRequest orderItemRequest2 = new OrderItemRequest();
-        orderItemRequest2.setSku("MB-P-13-M1-GRE");
+        orderItemRequest2.setSku("FA-002");
         orderItemRequest2.setQuantity(5);
         orderItemRequests.add(orderItemRequest2);
 

@@ -55,6 +55,7 @@ public class ProductServiceImpl implements ProductService {
         existedProduct.setDescription(productDTO.getDescription());
         existedProduct.setPrice(productDTO.getPrice());
         existedProduct.setStock(productDTO.getStock());
+        existedProduct.setImageSrc(productDTO.getImageSrc());
         existedProduct = productRepository.save(existedProduct);
         return ProductMapper.toDTO(existedProduct);
     }

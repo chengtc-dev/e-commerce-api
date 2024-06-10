@@ -55,6 +55,10 @@ public class OrderServiceImpl implements OrderService {
             totalAmount = totalAmount.add(amount);
             orderItem.setAmount(amount);
             orderItem.setOrderId(order.getId());
+            orderItem.setSku(orderItem.getSku());
+            orderItem.setName(product.getName());
+            orderItem.setPrice(product.getPrice());
+            orderItem.setImageSrc(product.getImageSrc());
         }
 
         order.setTotalAmount(totalAmount);

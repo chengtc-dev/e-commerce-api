@@ -18,6 +18,9 @@ public class OrderItemMapper {
         response.setAmount(orderItem.getAmount());
         response.setSku(orderItem.getSku());
         response.setQuantity(orderItem.getQuantity());
+        response.setPrice(orderItem.getPrice());
+        response.setName(orderItem.getName());
+        response.setImageSrc(orderItem.getImageSrc());
         return response;
     }
 

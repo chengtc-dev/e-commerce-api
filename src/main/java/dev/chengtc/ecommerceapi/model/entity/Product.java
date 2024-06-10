@@ -30,4 +30,7 @@ public class Product extends BaseEntity {
     @Column(name = "stock", nullable = false)
     private Integer stock;
 
+    @Column(name = "image_src", nullable = false)
+    private String imageSrc;
+
 }
